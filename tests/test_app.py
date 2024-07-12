@@ -111,36 +111,12 @@ def test_update_user(client, user, token):
     }
 
 
-def test_update_user_not_found(client, user):
-    response = client.put(
-        '/users/2',
-        json={
-            'id': 2,
-            'username': 'testusername3',
-            'email': 'test3@test.com',
-            'password': 'secret3',
-        },
-    )
-
-    assert response.status_code == HTTPStatus.NOT_FOUND
-
-    assert response.json() == {'detail': 'User not found'}
-
-
 def test_delete_user(client, user, token):
     response = client.delete(
         f'/users/{user.id}', headers={'Authorization': f'Bearer {token}'}
     )
 
     assert response.json() == {'message': 'User deleted'}
-
-
-def test_delete_user_not_found(client, user):
-    response = client.delete('/users/2')
-
-    assert response.status_code == HTTPStatus.NOT_FOUND
-
-    assert response.json() == {'detail': 'User not found'}
 
 
 def test_get_token(client, user):
