@@ -28,8 +28,8 @@ def test_create_user_already_registered(client, user):
     response = client.post(
         '/users/',
         json={
-            'username': 'testuser',
-            'email': 'user@test.com',
+            'username': user.username,
+            'email': 'user1@test.com',
             'password': 'secretpassword',
         },
     )
@@ -43,7 +43,7 @@ def test_create_email_already_registered(client, user):
         '/users/',
         json={
             'username': 'testuser2',
-            'email': 'user@test.com',
+            'email': user.email,
             'password': 'secretpassword',
         },
     )
@@ -66,13 +66,13 @@ def test_read_users_with_users(client, user):
 
 
 def test_read_user(client, user):
-    response = client.get('/users/1')
+    response = client.get(f'/users/{user.id}')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'id': 1,
-        'username': 'testuser',
-        'email': 'user@test.com',
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
     }
 
 
@@ -104,9 +104,9 @@ def test_update_user(client, user, token):
     }
 
 
-def test_update_unauthorized_user(client, user, token):
+def test_update_unauthorized_user(client, other_user, token):
     response = client.put(
-        f'/users/{user.id + 1}',
+        f'/users/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'updatedusername',
@@ -129,9 +129,9 @@ def test_delete_user(client, user, token):
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_unauthorized_user(client, user, token):
+def test_delete_unauthorized_user(client, other_user, token):
     response = client.delete(
-        f'/users/{user.id + 1}', headers={'Authorization': f'Bearer {token}'}
+        f'/users/{other_user.id}', headers={'Authorization': f'Bearer {token}'}
     )
 
     assert response.status_code == HTTPStatus.FORBIDDEN
